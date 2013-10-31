@@ -93,11 +93,9 @@ class Listener
 
   #setLevel(level) sets the global default level
   #setLevel(name, level) sets the level for name
-  setLevel: (level) ->
-    if arguments[1]
-      #setLevel(name, level)
-      name = arguments[0]
-      level = arguments[1]
+  setLevel: (name, level) ->
+    #setLevel(name, level)
+    if level
       throw new Error 'Must supply a name' unless name
 
       levels = {}
@@ -105,6 +103,8 @@ class Listener
       @setLevels levels
       return
 
+    #setLevel(level)
+    level = name
     throw new Error 'Must supply a level' unless level
     return if __loggerLevel == level
     oldLevel = __loggerLevel
@@ -129,8 +129,9 @@ class Listener
       oldLevel = @logLevels[name]
       return if level == oldLevel
       logger = @loggers[name]
-      @detach name
-      @listen logger, name, level
+      if logger
+        @detach name
+        @listen logger, name, level
 
   listen: (logger, name, level=null) ->
     unless logger
@@ -200,10 +201,10 @@ class @Logger extends EventEmitter
     listener.listen this, options.name, options.logLevel
 
   @setLevel: (level) ->
-    listener.setLevel level
+    listener.setLevel.apply listener, arguments
 
-  @setLevels: (name, level) ->
-    listener.setLevels name, level
+  @setLevels: (levels) ->
+    listener.setLevels levels
 
   @onError: (callback) ->
     __onError = callback
