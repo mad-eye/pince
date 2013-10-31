@@ -84,12 +84,18 @@ class Listener
     #Default logLevel
     @logLevel = options.logLevel ? __loggerLevel
     #logLevels for specific loggers
-    @logLevels = {}
+    @logLevels = options.logLevels ? __specificLoggerLevels
     #remember loggers for changing levels later
     @loggers = {}
     # Need to remember these to detach
     # name: {level: fn}
     @listenFns = {}
+
+  _reattachLoggers: ->
+    #recalculate how we listen to listeners and loggers
+    for name, logger of @loggers
+      @detach name
+      @listen logger, name
 
   #setLevel(level) sets the global default level
   #setLevel(name, level) sets the level for name
@@ -106,34 +112,36 @@ class Listener
     #setLevel(level)
     level = name
     throw new Error 'Must supply a level' unless level
-    return if __loggerLevel == level
-    oldLevel = __loggerLevel
-    __loggerLevel = level
-
-    #recalculate how we listen to listeners and loggers
-    for name, logger of @loggers
-      thisLevel = @logLevels[name]
-      if thisLevel
-        #No need to recaculate if the loggers level is above or below
-        #both oldLevel and the new level
-        unless level < thisLevel < oldLevel or oldLevel < thisLevel < level
-          continue
-
-      @detach name
-      @listen logger, name, thisLevel
+    return if @logLevel == level
+    @logLevel = level
+    @_reattachLoggers()
     return
 
   #levels is an object {name:level} which sets each name to level
   setLevels: (levels) ->
     for name, level of levels
-      oldLevel = @logLevels[name]
-      return if level == oldLevel
-      logger = @loggers[name]
-      if logger
-        @detach name
-        @listen logger, name, level
+      @logLevels[name] = level
 
-  listen: (logger, name, level=null) ->
+    @_reattachLoggers()
+
+  #Check first for any specific levels
+  findLevelFor: (name) ->
+    level = @logLevels[name]
+
+    #Check hierarchically up the : chain
+    parentName = name
+    while (parentName.indexOf(':') > -1) and not level
+      lastIdx = parentName.lastIndexOf(':')
+      parentName = parentName.substr 0, lastIdx
+      parentLevel = @logLevels[parentName]
+      level ?= parentLevel
+      break if level
+
+
+    level ?= @logLevel
+    return level
+
+  listen: (logger, name) ->
     unless logger
       throw Error "An object is required for logging!"
     unless name
@@ -141,8 +149,8 @@ class Listener
     @loggers[name] = logger
     @logLevels[name] = level if level
 
-    level ?= __specificLoggerLevels[name]
-    level ?= __loggerLevel
+    level = @findLevelFor name
+
     #TODO: Detach possibly existing logger
     @listenFns[name] = {}
 
@@ -169,7 +177,7 @@ class Listener
       logger.removeListener level, listenFn
     delete @listenFns[name]
     delete @loggers[name]
-    delete @logLevels[name]
+    #delete @logLevels[name]
     return
   
   handleLog: (data) ->
@@ -204,7 +212,7 @@ class @Logger extends EventEmitter
     listener.setLevel.apply listener, arguments
 
   @setLevels: (levels) ->
-    listener.setLevels levels
+    listener.setLevels.apply listener, arguments
 
   @onError: (callback) ->
     __onError = callback
