@@ -1,0 +1,12 @@
+{
+  "name": "argus",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./index.js",
+  "dependencies": {
+    "coffee-script": "1.6.3",
+    "underscore": "1.5.1",
+    "moment": "2.1.0",
+    "cli-color": "0.2.2"
+  }
+}
