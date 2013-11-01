@@ -66,7 +66,6 @@ parseSpecificLogLevels = ->
     name = k.substr "#{LOG_PREFIX}_".length
     name = name.split('_').join(':')
     specificLogLevels[name] = v
-  console.log "SpecificLogLevels:", specificLogLevels
   return specificLogLevels
 
 
@@ -200,7 +199,7 @@ class Listener
 
 listener = new Listener()
 
-class @Logger extends EventEmitter
+class Logger extends EventEmitter
   constructor: (options) ->
     options ?= {}
     if 'string' == typeof options
@@ -234,6 +233,7 @@ class @Logger extends EventEmitter
   warn: (messages...) -> @_log 'warn', messages
   error: (messages...) -> @_log 'error', messages
 
+@Logger = Logger
 Logger.listener = listener
 unless typeof exports == "undefined"
   module.exports = Logger
