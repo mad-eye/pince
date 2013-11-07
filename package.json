@@ -7,7 +7,7 @@
     "logger",
     "log4j"
   ],
-  "private": true,
+  "private": false,
   "homepage": "https://github.com/mad-eye/pince",
   "author": {
     "name": "James A. Gill",
