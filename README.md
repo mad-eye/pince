@@ -1,9 +1,11 @@
-MadEye Logger
-=============
+Pince
+=====
 
-MadEye Logger is a lightweight logger that combines some of the best
+Pince is a lightweight logger that combines some of the best
 properties of log4j and node.  It's equally usable in Node, (most)
 browsers, and Meteor (client and server).
+
+It was developed for [MadEye](https://madeye.io).
 
 Features:
 
