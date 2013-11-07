@@ -19,18 +19,15 @@ Features:
 
 Installation (Node.js)
 ----------------------
-
-Right now, just clone this repo into your `node_modules` directory.
-Coming soon, `npm install pince`.
+To install, `npm install pince`.
 
 In any file you wish to make a logger, require it via
 `Logger = require('pince');`
 
 Installation (Meteor)
 ---------------------
-Right now, just clone this repo into your `packages` directory and
-type `meteor add pince`.
-Coming soon, `mrt add pince`.
+To install, just `mrt add pince`.  The global `Logger` symbol will be there
+waiting for you.
 
 Usage
 ----------
