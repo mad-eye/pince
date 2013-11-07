@@ -72,7 +72,7 @@ controllerLog.info("Hello? Hello??");
 Hierarchically name and set levels:
 ```javascript
 routerLog = new Logger('myPackage:router');
-controllerLog = new Logger('myPackage:controller);
+controllerLog = new Logger('myPackage:controller');
 Logger.setLevel('myPackage', 'info');
 Logger.setLevel('myPackage:controller', 'debug');
 
