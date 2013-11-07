@@ -21,18 +21,18 @@ Installation (Node.js)
 ----------------------
 
 Right now, just clone this repo into your `node_modules` directory.
-Coming soon, `npm install madeye-logger`.
+Coming soon, `npm install pince`.
 
 In any file you wish to make a logger, require it via
-`Logger = require('madeye-logger');`
+`Logger = require('pince');`
 
 Installation (Meteor)
 ---------------------
-Right now, just clien this repo into your `packages` directory and
-type `meteor add logger`.
-Coming soon, `mrt add logger`.
+Right now, just clone this repo into your `packages` directory and
+type `meteor add pince`.
+Coming soon, `mrt add pince`.
 
-Quickstart
+Usage
 ----------
 
 Set the log level:
@@ -67,5 +67,17 @@ routerLog.info("Finally! Someone is listening to me.");
 //2013-10-31 11:32:48.374 info:  [router]  Finally! Someone is listening to me.
 controllerLog.info("Hello? Hello??");
 //Nothing
+```
+
+Hierarchically name and set levels:
+```javascript
+routerLog = new Logger('myPackage:router');
+controllerLog = new Logger('myPackage:controller);
+Logger.setLevel('myPackage', 'info');
+Logger.setLevel('myPackage:controller', 'debug');
+
+routerLog.info('You can see this.');
+routerLog.debug('You cannot see this; myPackage level is set to info.');
+controllerLog.debug('You can see this, myPackage:controller level is set to debug.');
 ```
  

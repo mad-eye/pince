@@ -1,7 +1,23 @@
 {
-  "name": "argus",
+  "name": "pince",
   "version": "0.0.1",
+  "description": "A logger for node inspired by log4j and commons-logging.",
+  "keywords": [
+    "logging",
+    "logger",
+    "log4j"
+  ],
   "private": true,
+  "homepage": "https://github.com/mad-eye/pince",
+  "author": {
+    "name": "James A. Gill",
+    "url": "https://github.com/jagill"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mad-eye/pince"
+  },
   "main": "./index.js",
   "dependencies": {
     "coffee-script": "1.6.3",

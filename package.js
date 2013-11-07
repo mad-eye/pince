@@ -1,5 +1,5 @@
 Package.describe({
-  summary: "common files shared by madeye projects"
+  summary: "A logger for Meteor inspired by log4j and commons-logging."
 });
 
 Npm.depends({

@@ -3,6 +3,8 @@
 #
 # microevent.js is copyright Jerome Etienne, and licensed under the MIT license:
 # https://github.com/jeromeetienne/microevent.js
+# Initial conversion to Coffeescript was done by Joseph Gentle in ShareJS
+# https://github.com/share/ShareJS
 
 nextTick = if process?.nextTick? then process.nextTick else (fn) -> setTimeout fn, 0
 
