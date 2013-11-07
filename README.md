@@ -47,7 +47,7 @@ log = new Logger('router');
 log.info("Routing.");
 //2013-10-31 11:29:36.097 info:  [router]  Routing.
 log.trace("Setting up routes...");
-//2013-10-31 11:29:36.101 trace:  [router]  Routing.
+//2013-10-31 11:29:36.101 trace:  [router]  Setting up routes...
 ```
 
 Set individual levels:
