@@ -17,4 +17,5 @@ Package.on_use(function (api, where) {
 
   if (api.export) //compat with pre-0.6.5
     api.export("Logger", ["server", "client"]);
+    api.export("MicroEvent", ["client"]);
 });
