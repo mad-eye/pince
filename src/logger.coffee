@@ -12,6 +12,7 @@ else #isServer
   else
     moment = require 'moment'
     {EventEmitter} = require 'events'
+    Pince = require './debug.js'
 
 __levelnums =
   error: 0
@@ -71,7 +72,6 @@ parseSpecificLogLevels = ->
 
 __loggerLevel = parseDefaultLogLevel() ? 'info'
 __specificLoggerLevels = parseSpecificLogLevels()
-
 
 __onError = null
 
@@ -193,9 +193,9 @@ class Listener
     messages.unshift prefix
   
     if __levelnums[data.level] <= __levelnums['warn']
-      console.error.apply console, messages
+      Pince.err messages
     else
-      console.log.apply console, messages
+      Pince.out messages
 
 listener = new Listener()
 
