@@ -1,6 +1,6 @@
 {
   "name": "pince",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A logger for node inspired by log4j and commons-logging.",
   "keywords": [
     "logging",
@@ -21,8 +21,8 @@
   "main": "./index.js",
   "dependencies": {
     "coffee-script": "1.6.3",
-    "underscore": "1.5.1",
-    "moment": "2.1.0",
-    "cli-color": "0.2.2"
+    "underscore": "1.5.2",
+    "moment": "2.4.0",
+    "cli-color": "0.2.3"
   }
 }

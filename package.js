@@ -3,8 +3,8 @@ Package.describe({
 });
 
 Npm.depends({
-  moment: '2.2.1',
-  'cli-color': '0.2.2'
+  moment: '2.4.0',
+  'cli-color': '0.2.3'
 
 });
 
