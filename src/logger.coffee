@@ -12,7 +12,7 @@ else #isServer
   else
     moment = require 'moment'
     {EventEmitter} = require 'events'
-    Pince = require './debug.js'
+    Pince = require './console.coffee'
 
 __levelnums =
   error: 0

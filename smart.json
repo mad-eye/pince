@@ -3,7 +3,7 @@
   "description": "A logger for Meteor inspired by log4j and commons-logging.",
   "homepage": "https://github.com/mad-eye/pince",
   "author": "James Gill  (https://github.com/jagill)",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "git": "https://github.com/mad-eye/pince.git"
 }
 

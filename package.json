@@ -1,6 +1,6 @@
 {
   "name": "pince",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A logger for node inspired by log4j and commons-logging.",
   "keywords": [
     "logging",
