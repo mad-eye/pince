@@ -2,4 +2,6 @@
 .filenametags
 .cscope.files
 .tags
+.build
+.npm
 dist/

@@ -3,8 +3,10 @@ Package.describe({
 });
 
 Npm.depends({
-  moment: '2.4.0',
-  'cli-color': '0.2.3'
+  "coffee-script": "1.6.3",
+  "underscore": "1.5.2",
+  "moment": "2.4.0",
+  "cli-color": "0.2.3"
 
 });
 
