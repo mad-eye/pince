@@ -120,8 +120,8 @@ class Listener
   setLevels: (levels) ->
     for name, level of levels
       @logLevels[name] = level
-
     @_reattachLoggers()
+    return
 
   #Check first for any specific levels
   findLevelFor: (name) ->
