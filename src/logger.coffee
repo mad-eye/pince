@@ -7,12 +7,11 @@ if isBrowser
   EventEmitter = MicroEvent
 else #isServer
   if isMeteor
-    moment = Npm.require 'moment'
     {EventEmitter} = Npm.require 'events'
+    ConsoleOutput = share.ConsoleOutput
   else
-    moment = require 'moment'
     {EventEmitter} = require 'events'
-    Pince = require './console.coffee'
+    ConsoleOutput = require './consoleOutput'
 
 __levelnums =
   error: 0
@@ -21,26 +20,6 @@ __levelnums =
   debug: 3
   trace: 4
 
-noop = (x) -> x
-if isBrowser
-  colors =
-    error: noop
-    warn: noop
-    info: noop
-    debug: noop
-    trace: noop
-else
-  if isMeteor
-    clc = Npm.require 'cli-color'
-  else
-    clc = require 'cli-color'
-
-  colors =
-    error: clc.red.bold
-    warn: clc.yellow
-    info: clc.bold
-    debug: clc.blue
-    trace: clc.blackBright
 
 LOG_PREFIX = 'MADEYE_LOGLEVEL'
 parseDefaultLogLevel = ->
@@ -89,6 +68,12 @@ class Listener
     # Need to remember these to detach
     # name: {level: fn}
     @listenFns = {}
+    if isBrowser
+      @_output = share.BrowserOutput.output
+      @__err = share.BrowserOutput.__err
+      @__out = share.BrowserOutput.__out
+    else
+      @_output = ConsoleOutput.output
 
   _reattachLoggers: ->
     #recalculate how we listen to listeners and loggers
@@ -178,24 +163,10 @@ class Listener
     delete @loggers[name]
     #delete @logLevels[name]
     return
-  
+
   handleLog: (data) ->
-    timestr = moment(data.timestamp).format("YYYY-MM-DD HH:mm:ss.SSS")
-    color = colors[data.level]
-    prefix = "#{timestr} #{color(data.level+": ")} "
-    prefix += "[#{data.name}] " if data.name
-
-    if 'string' == typeof data.message
-      messages = [data.message]
-    else
-      messages = data.message
-
-    messages.unshift prefix
-  
-    if __levelnums[data.level] <= __levelnums['warn']
-      Pince.err messages
-    else
-      Pince.out messages
+    data.stderr = ( __levelnums[data.level] <= __levelnums['warn'] )
+    @_output data
 
 listener = new Listener()
 

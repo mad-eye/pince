@@ -14,8 +14,9 @@ Package.on_use(function (api, where) {
 
   api.use(["coffeescript", 'underscore'], ["client", "server"]);
 
-  api.add_files(["src/microevent.coffee"], 'client');
-  api.add_files(['src/console.coffee', "src/logger.coffee"], ["client", 'server']);
+  api.add_files(["src/microevent.coffee", 'src/browserOutput.coffee'], 'client');
+  api.add_files(['src/consoleOutput.coffee'], 'server');
+  api.add_files(["src/logger.coffee"], ["client", 'server']);
 
   if (api.export) //compat with pre-0.6.5
     api.export("Pince", ["server", "client"]);
