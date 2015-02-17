@@ -31,6 +31,10 @@ Installation (Meteor)
 To install, just `mrt add pince`.  The global `Logger` symbol will be there
 waiting for you.
 
+By default, on the server Meteor will prepend a string to logs that includes
+a timestamp (amongst other things).  To silence Meteor's prefix, run meteor
+with the `--raw-logs` flag: `meteor --raw-logs`.
+
 Usage
 ----------
 
@@ -79,4 +83,3 @@ routerLog.info('You can see this.');
 routerLog.debug('You cannot see this; myPackage level is set to info.');
 controllerLog.debug('You can see this, myPackage:controller level is set to debug.');
 ```
- 

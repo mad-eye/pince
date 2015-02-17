@@ -9,6 +9,10 @@
       "1.1.3"
     ],
     [
+      "momentjs:moment",
+      "2.8.4"
+    ],
+    [
       "underscore",
       "1.0.1"
     ]

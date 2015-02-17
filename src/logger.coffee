@@ -1,18 +1,31 @@
 isMeteor = 'undefined' != typeof Meteor
 isBrowser = 'undefined' != typeof window
 
-if isBrowser
+# Man, importing things in CS in Meteor is a PITA
+# moment
+if isMeteor
+  moment = Package['momentjs:moment'].moment
+else if isBrowser
+  # TODO: Import moment for non-Meteor browsers
   moment = (date) -> moment
   moment.format = (format) -> ""
+else # node
+  moment = require 'moment'
+
+if isBrowser
   EventEmitter = MicroEvent
 else #isServer
   if isMeteor
-    moment = Npm.require 'moment'
     {EventEmitter} = Npm.require 'events'
   else
-    moment = require 'moment'
     {EventEmitter} = require 'events'
     Pince = require './console.coffee'
+
+__extend = (obj, others...) ->
+  for o in others
+    for own k, v of o
+      obj[k] = v
+  return obj
 
 __levelnums =
   error: 0
@@ -178,9 +191,13 @@ class Listener
     delete @loggers[name]
     #delete @logLevels[name]
     return
-  
+
   handleLog: (data) ->
-    timestr = moment(data.timestamp).format("YYYY-MM-DD HH:mm:ss.SSS")
+    if isBrowser
+      timestr = moment(data.timestamp).format("HH:mm:ss.SSS")
+    else
+      timestr = moment(data.timestamp).format("YYYY-MM-DD HH:mm:ss.SSS")
+
     color = colors[data.level]
     prefix = "#{timestr} #{color(data.level+": ")} "
     prefix += "[#{data.name}] " if data.name
@@ -191,7 +208,7 @@ class Listener
       messages = data.message
 
     messages.unshift prefix
-  
+
     if __levelnums[data.level] <= __levelnums['warn']
       Pince.err messages
     else

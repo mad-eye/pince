@@ -6,7 +6,6 @@ Package.describe({
 });
 
 Npm.depends({
-  "moment": "2.4.0",
   "cli-color": "0.2.3"
 
 });
@@ -14,11 +13,11 @@ Npm.depends({
 Package.onUse(function (api, where) {
   api.versionsFrom('0.9.0');
 
-  api.use('underscore');
   api.use('coffeescript');
+  api.use('momentjs:moment');
 
-  api.add_files(["src/microevent.coffee"], 'client');
-  api.add_files(['src/console.coffee', "src/logger.coffee"]);
+  api.addFiles(['src/microevent.coffee'], 'client');
+  api.addFiles(['src/console.coffee', 'src/logger.coffee']);
 
   api.export("Pince");
   api.export("Logger");
