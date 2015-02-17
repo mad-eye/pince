@@ -46,7 +46,7 @@ Logger.setLevel('trace');
 
 Make a new logger:
 ```javascript
-log = new Logger('router');
+var log = new Logger('router');
 log.info("Routing.");
 //2013-10-31 11:29:36.097 info:  [router]  Routing.
 log.trace("Setting up routes...");
@@ -57,8 +57,8 @@ Set individual levels:
 ```javascript
 Logger.setLevel('info');
 Logger.setLevel('controller', 'trace');
-routerLog = new Logger('router');
-controllerLog = new Logger('controller');
+var routerLog = new Logger('router');
+var controllerLog = new Logger('controller');
 
 routerLog.trace("Can't hear me!");
 //Nothing
@@ -74,8 +74,8 @@ controllerLog.info("Hello? Hello??");
 
 Hierarchically name and set levels:
 ```javascript
-routerLog = new Logger('myPackage:router');
-controllerLog = new Logger('myPackage:controller');
+var routerLog = new Logger('myPackage:router');
+var controllerLog = new Logger('myPackage:controller');
 Logger.setLevel('myPackage', 'info');
 Logger.setLevel('myPackage:controller', 'debug');
 
