@@ -1,5 +1,5 @@
-isMeteor = 'undefined' != typeof Meteor
-isBrowser = 'undefined' != typeof window
+isMeteor = typeof Meteor isnt 'undefined'
+isBrowser = typeof window isnt 'undefined'
 
 # Man, importing things in CS in Meteor is a PITA
 # moment
@@ -250,7 +250,14 @@ class Logger extends EventEmitter
   warn: (messages...) -> @_log 'warn', messages
   error: (messages...) -> @_log 'error', messages
 
-@Logger = Logger
 Logger.listener = listener
-unless typeof exports == "undefined"
+
+# Exporting, also a PITA
+if typeof Package isnt 'undefined'
+  @Logger = Logger
+else if define?.amd
+  define [], () -> Logger
+else if module?.exports
   module.exports = Logger
+else # Browser
+  @Logger = Logger
