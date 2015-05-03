@@ -17,9 +17,10 @@ if isBrowser
 else #isServer
   if isMeteor
     {EventEmitter} = Npm.require 'events'
+    ConsoleOutput = share.ConsoleOutput
   else
     {EventEmitter} = require 'events'
-    Pince = require './console.coffee'
+    ConsoleOutput = require './consoleOutput'
 
 __extend = (obj, others...) ->
   for o in others
@@ -34,26 +35,6 @@ __levelnums =
   debug: 3
   trace: 4
 
-noop = (x) -> x
-if isBrowser
-  colors =
-    error: noop
-    warn: noop
-    info: noop
-    debug: noop
-    trace: noop
-else
-  if isMeteor
-    clc = Npm.require 'cli-color'
-  else
-    clc = require 'cli-color'
-
-  colors =
-    error: clc.red.bold
-    warn: clc.yellow
-    info: clc.bold
-    debug: clc.blue
-    trace: clc.blackBright
 
 LOG_PREFIX = 'MADEYE_LOGLEVEL'
 parseDefaultLogLevel = ->
@@ -102,6 +83,12 @@ class Listener
     # Need to remember these to detach
     # name: {level: fn}
     @listenFns = {}
+    if isBrowser
+      @_output = share.BrowserOutput.output
+      @__err = share.BrowserOutput.__err
+      @__out = share.BrowserOutput.__out
+    else
+      @_output = ConsoleOutput.output
 
   _reattachLoggers: ->
     #recalculate how we listen to listeners and loggers

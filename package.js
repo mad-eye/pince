@@ -16,8 +16,9 @@ Package.onUse(function (api, where) {
   api.use('coffeescript');
   api.use('momentjs:moment');
 
-  api.addFiles(['src/microevent.coffee'], 'client');
-  api.addFiles(['src/console.coffee', 'src/logger.coffee']);
+  api.add_files(['src/microevent.coffee', 'src/browserOutput.coffee'], 'client');
+  api.add_files(['src/consoleOutput.coffee'], 'server');
+  api.add_files(['src/logger.coffee'], ['client', 'server']);
 
   api.export("Pince");
   api.export("Logger");
