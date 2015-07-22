@@ -1,13 +1,12 @@
 Package.describe({
   summary: "A logger for Meteor inspired by log4j and commons-logging.",
-  version: "0.0.6",
+  version: "0.0.7",
   name: "jag:pince",
   git: "https://github.com/mad-eye/pince.git",
 });
 
 Npm.depends({
   "cli-color": "0.2.3"
-
 });
 
 Package.onUse(function (api, where) {
