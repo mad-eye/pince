@@ -13,7 +13,7 @@ Package.onUse(function (api, where) {
   api.versionsFrom('0.9.0');
 
   api.use('coffeescript');
-  api.use('momentjs:moment');
+  api.use('momentjs:moment@2.10.3');
 
   api.add_files(['src/microevent.coffee', 'src/browserOutput.coffee'], 'client');
   api.add_files(['src/consoleOutput.coffee'], 'server');
