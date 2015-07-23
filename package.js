@@ -10,7 +10,7 @@ Npm.depends({
 });
 
 Package.onUse(function (api, where) {
-  api.use('coffeescript');
+  api.use('coffeescript@1.0.6');
   api.use('momentjs:moment@2.10.3');
 
   api.export('Logger');
