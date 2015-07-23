@@ -28,8 +28,8 @@ In any file you wish to make a logger, require it via
 
 Installation (Meteor)
 ---------------------
-To install, just `mrt add pince`.  The global `Logger` symbol will be there
-waiting for you.
+To install, just `meteor add jag:pince`.  The global `Logger` symbol will be
+there waiting for you.
 
 By default, on the server Meteor will prepend a string to logs that includes
 a timestamp (amongst other things).  To silence Meteor's prefix, run meteor
@@ -62,7 +62,7 @@ var controllerLog = new Logger('controller');
 
 routerLog.trace("Can't hear me!");
 //Nothing
-controllerLog.trace("Can hear me."):
+controllerLog.trace("Can hear me.");
 //2013-10-31 11:31:21.906 trace:  [controller]  Can hear me.
 
 Logger.setLevels({router:'debug', controller:'warn'});

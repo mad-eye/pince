@@ -1,0 +1,1 @@
+window.Logger = Logger

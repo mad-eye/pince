@@ -13,12 +13,12 @@ class MicroEvent
     @_events ||= {}
     @_events[event] ||= []
     @_events[event].push(fct)
-    this
+    return this
 
   removeListener: (event, fct) ->
     @_events ||= {}
     listeners = (@_events[event] ||= [])
-    
+
     # Sadly, there's no IE8- support for indexOf.
     i = 0
     while i < listeners.length
@@ -27,7 +27,7 @@ class MicroEvent
 
     nextTick => @_events[event] = (x for x in @_events[event] when x)
 
-    this
+    return this
 
   emit: (event, args...) ->
     return this unless @_events?[event]
@@ -44,11 +44,4 @@ MicroEvent.mixin = (obj) ->
   proto.emit = MicroEvent.prototype.emit
   obj
 
-isBrowser = 'undefined' != typeof window
-isMeteor = 'undefined' != typeof Meteor
-if isBrowser || isMeteor
-  @MicroEvent = MicroEvent
-else
-  module.exports = MicroEvent
-
-
+EventEmitter = MicroEvent

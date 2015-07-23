@@ -4,4 +4,8 @@
 .tags
 .build
 .npm
-dist/
+src/
+test/
+versions.json
+package.js
+gulpfile.coffee

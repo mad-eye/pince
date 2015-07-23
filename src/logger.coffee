@@ -1,26 +1,4 @@
-isMeteor = 'undefined' != typeof Meteor
-isBrowser = 'undefined' != typeof window
-
-# Man, importing things in CS in Meteor is a PITA
-# moment
-if isMeteor
-  moment = Package['momentjs:moment'].moment
-else if isBrowser
-  # TODO: Import moment for non-Meteor browsers
-  moment = (date) -> moment
-  moment.format = (format) -> ""
-else # node
-  moment = require 'moment'
-
-if isBrowser
-  EventEmitter = MicroEvent
-else #isServer
-  if isMeteor
-    {EventEmitter} = Npm.require 'events'
-    ConsoleOutput = share.ConsoleOutput
-  else
-    {EventEmitter} = require 'events'
-    ConsoleOutput = require './consoleOutput'
+# We have output, defaultLogLevel, specificLogLevels from preceding files
 
 __extend = (obj, others...) ->
   for o in others
@@ -35,37 +13,8 @@ __levelnums =
   debug: 3
   trace: 4
 
-
-LOG_PREFIX = 'MADEYE_LOGLEVEL'
-parseDefaultLogLevel = ->
-  if isBrowser
-    if isMeteor
-      defaultLogLevel = Meteor.settings?.public?.logLevel
-    else
-      defaultLogLevel = null
-  else
-    defaultLogLevel = process.env[LOG_PREFIX]
-  return defaultLogLevel
-
-parseSpecificLogLevels = ->
-  if isBrowser
-    if isMeteor
-      return Meteor.settings?.public?.specificLogLevels ? {}
-    else
-      return {}
-
-  specificLogLevels = {}
-  for k,v of process.env
-    continue unless k.indexOf("#{LOG_PREFIX}_") == 0
-    continue if k == LOG_PREFIX
-    name = k.substr "#{LOG_PREFIX}_".length
-    name = name.split('_').join(':')
-    specificLogLevels[name] = v
-  return specificLogLevels
-
-
-__loggerLevel = parseDefaultLogLevel() ? 'info'
-__specificLoggerLevels = parseSpecificLogLevels()
+__loggerLevel = defaultLogLevel
+__specificLoggerLevels = specificLogLevels
 
 __onError = null
 
@@ -83,12 +32,6 @@ class Listener
     # Need to remember these to detach
     # name: {level: fn}
     @listenFns = {}
-    if isBrowser
-      @_output = share.BrowserOutput.output
-      @__err = share.BrowserOutput.__err
-      @__out = share.BrowserOutput.__out
-    else
-      @_output = ConsoleOutput.output
 
   _reattachLoggers: ->
     #recalculate how we listen to listeners and loggers
@@ -163,8 +106,10 @@ class Listener
 
     ['warn', 'info', 'debug', 'trace'].forEach (l) =>
       return if __levelnums[l] > __levelnums[level]
+      useStderr =  __levelnums[l] <= __levelnums['warn']
+
       listenFn = (msgs...) =>
-        @handleLog timestamp: new Date, level:l, name:name, message:msgs
+        output timestamp: new Date, level:l, name:name, message:msgs, stderr: useStderr
       logger.on l, listenFn
       @listenFns[name][l] = listenFn
     return
@@ -178,28 +123,6 @@ class Listener
     delete @loggers[name]
     #delete @logLevels[name]
     return
-
-  handleLog: (data) ->
-    if isBrowser
-      timestr = moment(data.timestamp).format("HH:mm:ss.SSS")
-    else
-      timestr = moment(data.timestamp).format("YYYY-MM-DD HH:mm:ss.SSS")
-
-    color = colors[data.level]
-    prefix = "#{timestr} #{color(data.level+": ")} "
-    prefix += "[#{data.name}] " if data.name
-
-    if 'string' == typeof data.message
-      messages = [data.message]
-    else
-      messages = data.message
-
-    messages.unshift prefix
-
-    if __levelnums[data.level] <= __levelnums['warn']
-      Pince.err messages
-    else
-      Pince.out messages
 
 listener = new Listener()
 
@@ -237,7 +160,4 @@ class Logger extends EventEmitter
   warn: (messages...) -> @_log 'warn', messages
   error: (messages...) -> @_log 'error', messages
 
-@Logger = Logger
 Logger.listener = listener
-unless typeof exports == "undefined"
-  module.exports = Logger
