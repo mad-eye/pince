@@ -1,6 +1,6 @@
 Package.describe({
   summary: "A logger for Meteor inspired by log4j and commons-logging.",
-  version: "0.0.8",
+  version: "0.0.9",
   name: "jag:pince",
   git: "https://github.com/mad-eye/pince.git",
 });

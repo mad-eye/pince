@@ -96,14 +96,6 @@ class Listener
     #TODO: Detach possibly existing logger
     @listenFns[name] = {}
 
-    errorFn = (msgs...) =>
-      shouldPrint = __onError? msgs
-      #Be explicit about false, to not trigger on undefined/null
-      unless shouldPrint == false
-        @handleLog timestamp: new Date, level:'error', name:name, message:msgs
-    logger.on 'error', errorFn
-    @listenFns[name]['error'] = errorFn
-
     ['warn', 'info', 'debug', 'trace'].forEach (l) =>
       return if __levelnums[l] > __levelnums[level]
       useStderr =  __levelnums[l] <= __levelnums['warn']
@@ -112,6 +104,19 @@ class Listener
         output timestamp: new Date, level:l, name:name, message:msgs, stderr: useStderr
       logger.on l, listenFn
       @listenFns[name][l] = listenFn
+
+    # Define error path
+    errorFn = (msgs...) =>
+      # If the user has defind a special error message, use that.
+      # They can return a boolean to decide if they want to also print normally
+      shouldPrint = __onError? msgs
+      #Be explicit about false, to not trigger on undefined/null
+      unless shouldPrint == false
+        output timestamp: new Date, level:'error', name:name, message:msgs, stderr: true
+    logger.on 'error', errorFn
+    @listenFns[name]['error'] = errorFn
+
+
     return
 
   detach: (name) ->
