@@ -7,26 +7,20 @@ inSrc = (path) -> 'src/' + path
 paths =
   browser: [
     'browserPrefix.coffee',
-    'microevent.coffee',
-    'browserOutput.coffee',
     'logger.coffee',
     'browserSuffix.coffee',
   ].map inSrc
   node: [
     'nodePrefix.coffee',
-    'consoleOutput.coffee',
     'logger.coffee',
     'nodeSuffix.coffee',
   ].map inSrc
   'meteor-server': [
     'meteorServerPrefix.coffee',
-    'consoleOutput.coffee',
     'logger.coffee',
   ].map inSrc
   'meteor-browser': [
     'meteorBrowserPrefix.coffee',
-    'microevent.coffee',
-    'browserOutput.coffee',
     'logger.coffee',
   ].map inSrc
 
@@ -50,6 +44,11 @@ gulp.task 'build-meteor-browser', ->
   # Due to annoying meteor/coffee namespacing, need to leave it as coffeescript.
   build 'meteor-browser', false
 
+gulp.task 'build-test', ->
+  gulp.src 'test/*.coffee'
+    .pipe coffee()
+    .pipe gulp.dest 'dist/'
+
 gulp.task 'build', ['build-node', 'build-browser', 'build-meteor-server', 'build-meteor-browser']
 
-gulp.task 'default', ['build']
+gulp.task 'default', ['build', 'build-test']

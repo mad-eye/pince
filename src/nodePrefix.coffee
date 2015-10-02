@@ -1,11 +1,9 @@
 clc = require 'cli-color'
-moment = require 'moment'
-{EventEmitter} = require 'events'
 
 # Log level stuff
 LOG_PREFIX = 'MADEYE_LOGLEVEL'
-defaultLogLevel = process.env[LOG_PREFIX]
-specificLogLevels = {}
+__baseLogLevel = process.env[LOG_PREFIX] || 'info'
+__specificLogLevels = {}
 for k,v of process.env
   continue unless k.indexOf("#{LOG_PREFIX}_") == 0
   continue if k == LOG_PREFIX

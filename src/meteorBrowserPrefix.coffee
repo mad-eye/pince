@@ -1,5 +1,2 @@
-moment = (date) -> moment
-moment.format = (format) -> ""
-
-defaultLogLevel = Meteor.settings?.public?.logLevel ? 'info'
-specificLogLevels =  Meteor.settings?.public?.specificLogLevels ? {}
+__baseLogLevel = Meteor.settings?.public?.logLevel ? 'info'
+__specificLogLevels =  Meteor.settings?.public?.specificLogLevels ? {}

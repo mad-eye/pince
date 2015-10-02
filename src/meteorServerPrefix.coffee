@@ -1,6 +1,4 @@
-moment = Package['momentjs:moment'].moment
-{EventEmitter} = Npm.require 'events'
 clc = Npm.require 'cli-color'
 
-defaultLogLevel = Meteor.settings?.public?.logLevel ? 'info'
-specificLogLevels =  Meteor.settings?.public?.specificLogLevels ? {}
+__baseLogLevel = Meteor.settings?.public?.logLevel ? 'info'
+__specificLogLevels =  Meteor.settings?.public?.specificLogLevels ? {}

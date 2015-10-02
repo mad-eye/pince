@@ -14,7 +14,7 @@ Features:
 * Change the log level with no code changes on the server.
 * Logging is very lightweight when there's nothing listening to it.
 * Each logger has a name -- you can set levels individually by name!
-* Names can be heirarchally namespaced by separating them with ':'s, like
+* Names can be hierarchically namespaced by separating them with ':'s, like
   `myLibrary:aModule:thisObject`.
 * Set log levels by any level of the namespace hierarcy!
 
@@ -34,6 +34,10 @@ there waiting for you.
 By default, on the server Meteor will prepend a string to logs that includes
 a timestamp (amongst other things).  To silence Meteor's prefix, run meteor
 with the `--raw-logs` flag: `meteor --raw-logs`.
+
+Installation (Browser)
+----------------------
+Just source `pince-browser.js`.
 
 Usage
 ----------

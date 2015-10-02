@@ -1,168 +1,152 @@
-# We have output, defaultLogLevel, specificLogLevels from preceding files
 
-__extend = (obj, others...) ->
-  for o in others
-    for own k, v of o
-      obj[k] = v
-  return obj
+## Formatting
 
-__levelnums =
-  error: 0
-  warn: 1
-  info: 2
-  debug: 3
-  trace: 4
+if typeof window != 'undefined'
+  noop = (x) -> x
+  colors =
+    error: noop
+    warn: noop
+    info: noop
+    debug: noop
+    trace: noop
+else
+  colors =
+    error: clc.red.bold
+    warn: clc.yellow
+    info: clc.bold
+    debug: clc.blue
+    trace: clc.blackBright
 
-__loggerLevel = defaultLogLevel
-__specificLoggerLevels = specificLogLevels
+# Pad integer d to n places with preceding 0s
+pad = (d, n) ->
+  d = d.toString()
+  while d.length < n
+    d = '0' + d
+  return d
 
-__onError = null
+# Map token to replacement values from date d
+__dateFormatStr = "YYYY-MM-DD HH:mm:ss.SSS"
 
-class Listener
-  constructor: (options) ->
-    options ?= {}
-    if 'string' == typeof options
-      options = logLevel: options
-    #Default logLevel
-    @logLevel = options.logLevel ? __loggerLevel
-    #logLevels for specific loggers
-    @logLevels = options.logLevels ? __specificLoggerLevels
-    #remember loggers for changing levels later
-    @loggers = {}
-    # Need to remember these to detach
-    # name: {level: fn}
-    @listenFns = {}
+__dateFormatTokens =
+  'YYYY': (d) -> pad(d.getFullYear(), 4)
+  'MM': (d) -> pad(d.getMonth(), 2)
+  'DD': (d) -> pad(d.getDate(), 2)
+  'HH': (d) -> pad(d.getHours(), 2)
+  'mm': (d) -> pad(d.getMinutes(), 2)
+  'ss': (d) -> pad(d.getSeconds(), 2)
+  'SSS': (d) -> pad(d.getMilliseconds(), 3)
 
-  _reattachLoggers: ->
-    #recalculate how we listen to listeners and loggers
-    for name, logger of @loggers
-      @detach name
-      @listen logger, name
+formatDate = (date, formatStr=__dateFormatStr) ->
+  str = formatStr
+  for token, valueFn of __dateFormatTokens
+    value = valueFn date
+    str = str.replace(token, value)
+  return str
 
-  #setLevel(level) sets the global default level
-  #setLevel(name, level) sets the level for name
-  setLevel: (name, level) ->
-    #setLevel(name, level)
-    if level
-      throw new Error 'Must supply a name' unless name
+__formatStr = "%T %L:  [%N]  %M"
 
-      levels = {}
-      levels[name] = level
-      @setLevels levels
-      return
+__formatTokens =
+  '%T': (data) -> data.formattedTimestamp
+  '%L': (data) -> colors[data.level](data.level)
+  '%N': (data) -> data.name
+  '%M': (data) -> data.messages[0]
 
-    #setLevel(level)
-    level = name
-    throw new Error 'Must supply a level' unless level
-    return if @logLevel == level
-    @logLevel = level
-    @_reattachLoggers()
+formatLog = (data, formatStr=__formatStr) ->
+  str = formatStr
+  for token, valueFn of __formatTokens
+    value = valueFn data
+    str = str.replace(token, value)
+  output = data.messages[1..]
+  output.unshift(str)
+  return output
+
+
+## END Formatting
+
+__levels = ['error', 'warn', 'info', 'debug', 'trace']
+__levelnums = {}
+__levelnums[l] = i for l, i in __levels
+
+findLevelFor = (name) ->
+  #Check first for any specific levels
+  level = __specificLogLevels[name]
+
+  #Check hierarchically up the : chain
+  parentName = name
+  while (parentName.indexOf(':') > -1) and not level?
+    lastIdx = parentName.lastIndexOf(':')
+    parentName = parentName.substr 0, lastIdx
+    level ?= __specificLogLevels[parentName]
+
+  level ?= __baseLogLevel
+  return level
+
+shouldLog = (name, level) ->
+  allowedLevelNum = __levelnums[findLevelFor name]
+  if __levelnums[level] > allowedLevelNum
+    return false
+  return true
+
+class Logger
+  # Class Methods
+  @setLevel = (name, level) ->
+    unless level
+      level = name
+      name = null
+
+    unless level of __levelnums
+      throw new Error("Level #{level} unknown.")
+
+    if name
+      __specificLogLevels[name] = level
+    else
+      __baseLogLevel = level
+
     return
 
   #levels is an object {name:level} which sets each name to level
-  setLevels: (levels) ->
-    for name, level of levels
-      @logLevels[name] = level
-    @_reattachLoggers()
-    return
-
-  #Check first for any specific levels
-  findLevelFor: (name) ->
-    level = @logLevels[name]
-
-    #Check hierarchically up the : chain
-    parentName = name
-    while (parentName.indexOf(':') > -1) and not level
-      lastIdx = parentName.lastIndexOf(':')
-      parentName = parentName.substr 0, lastIdx
-      parentLevel = @logLevels[parentName]
-      level ?= parentLevel
-      break if level
-
-
-    level ?= @logLevel
-    return level
-
-  listen: (logger, name) ->
-    unless logger
-      throw Error "An object is required for logging!"
-    unless name
-      throw Error "Name is required for logging!"
-    @loggers[name] = logger
-    @logLevels[name] = level if level
-
-    level = @findLevelFor name
-
-    #TODO: Detach possibly existing logger
-    @listenFns[name] = {}
-
-    ['warn', 'info', 'debug', 'trace'].forEach (l) =>
-      return if __levelnums[l] > __levelnums[level]
-      useStderr =  __levelnums[l] <= __levelnums['warn']
-
-      listenFn = (msgs...) =>
-        output timestamp: new Date, level:l, name:name, message:msgs, stderr: useStderr
-      logger.on l, listenFn
-      @listenFns[name][l] = listenFn
-
-    # Define error path
-    errorFn = (msgs...) =>
-      # If the user has defind a special error message, use that.
-      # They can return a boolean to decide if they want to also print normally
-      shouldPrint = __onError? msgs
-      #Be explicit about false, to not trigger on undefined/null
-      unless shouldPrint == false
-        output timestamp: new Date, level:'error', name:name, message:msgs, stderr: true
-    logger.on 'error', errorFn
-    @listenFns[name]['error'] = errorFn
-
-
-    return
-
-  detach: (name) ->
-    logger = @loggers[name]
-    return unless logger
-    for level, listenFn of @listenFns[name]
-      logger.removeListener level, listenFn
-    delete @listenFns[name]
-    delete @loggers[name]
-    #delete @logLevels[name]
-    return
-
-listener = new Listener()
-
-class Logger extends EventEmitter
-  constructor: (options) ->
-    options ?= {}
-    if 'string' == typeof options
-      options = name: options
-    @name = options.name
-    listener.listen this, options.name, options.logLevel
-
-  @setLevel: (level) ->
-    listener.setLevel.apply listener, arguments
-
   @setLevels: (levels) ->
-    listener.setLevels.apply listener, arguments
+    for name, level of levels
+      __specificLogLevels[name] = level
+    return
 
-  @onError: (callback) ->
-    __onError = callback
+  @setDateFormat: (str) ->
+    __dateFormatStr = str
 
-  @listen: (logger, name, level) ->
-    listener.listen logger, name, level
+  @setFormat: (str) ->
+    __formatStr = str
 
-  #take single message arg, that is an array.
-  _log: (level, messages) ->
-    messages.unshift level
-    @emit.apply this, messages
+  @_log = (data) ->
+    return unless shouldLog data.name, data.level
+    @_output data
 
-  #take multiple args
-  log: (level, messages...) -> @_log level, messages
+  @_output = (data) ->
+    # 2013-10-31 11:32:48.374 info:  [router]  Finally! Someone is
+    data.formattedTimestamp = formatDate(data.timestamp, __dateFormatStr)
+    output = formatLog(data, __formatStr)
+    switch data.level
+      when 'trace', 'debug' then fn = console.log
+      when 'info' then fn = console.info ? console.log
+      when 'warn' then fn = console.warn ? console.log
+      when 'error' then fn = console.error ? console.log
+    fn.apply console, output
 
-  trace: (messages...) -> @_log 'trace', messages
-  debug: (messages...) -> @_log 'debug', messages
-  info: (messages...) -> @_log 'info', messages
-  warn: (messages...) -> @_log 'warn', messages
-  error: (messages...) -> @_log 'error', messages
+  # Instance Methods
+  constructor: (@name) ->
 
-Logger.listener = listener
+  trace: (messages...) -> @log 'trace', messages
+  debug: (messages...) -> @log 'debug', messages
+  info: (messages...) -> @log 'info', messages
+  warn: (messages...) -> @log 'warn', messages
+  error: (messages...) -> @log 'error', messages
+
+  # log takes messages as an array.  It will ignore additional arguments.
+  log: (level, messages) ->
+    unless Array.isArray messages
+      messages = [messages]
+
+    data = {level, messages}
+    data.name = @name
+    data.timestamp = new Date()
+
+    Logger._log data
