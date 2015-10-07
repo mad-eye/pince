@@ -112,5 +112,3 @@ describe 'Logger', ->
     it 'should apply specific level to specific sub-loggers', ->
       controllerLog.debug 'You can see this, myPackage:controller level is set to debug.'
       assert.isTrue Logger._output.called
-
-  describe 'formatter', ->
